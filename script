@@ -1,0 +1,143 @@
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local KEY_CORRETA = "baitola"
+local autorizado = false
+
+-- GUI de verificação de key
+local keyGui = Instance.new("ScreenGui", playerGui)
+keyGui.Name = "KeySystem"
+
+local frame = Instance.new("Frame", keyGui)
+frame.Size = UDim2.new(0.3, 0, 0.25, 0)
+frame.Position = UDim2.new(0.35, 0, 0.35, 0)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BorderSizePixel = 0
+
+local title = Instance.new("TextLabel", frame)
+title.Text = "🔐 Digite a key para continuar"
+title.Size = UDim2.new(1, 0, 0.3, 0)
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.TextScaled = true
+
+local textBox = Instance.new("TextBox", frame)
+textBox.PlaceholderText = "Digite a key aqui..."
+textBox.Size = UDim2.new(0.9, 0, 0.3, 0)
+textBox.Position = UDim2.new(0.05, 0, 0.35, 0)
+textBox.TextScaled = true
+textBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+textBox.TextColor3 = Color3.new(1, 1, 1)
+
+local confirmar = Instance.new("TextButton", frame)
+confirmar.Text = "🔓 Confirmar"
+confirmar.Size = UDim2.new(0.6, 0, 0.2, 0)
+confirmar.Position = UDim2.new(0.2, 0, 0.7, 0)
+confirmar.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+confirmar.TextColor3 = Color3.new(1, 1, 1)
+confirmar.TextScaled = true
+
+confirmar.MouseButton1Click:Connect(function()
+	if textBox.Text == KEY_CORRETA then
+		autorizado = true
+		keyGui:Destroy()
+	else
+		textBox.Text = ""
+		textBox.PlaceholderText = "❌ Key incorreta. Tente novamente"
+	end
+end)
+
+-- Aguarda a key ser correta
+while not autorizado do
+	task.wait()
+end
+
+-- CONTINUAÇÃO: funcionalidades desbloqueadas após key
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+
+-- CRIA TELEPORTES PARA TESTE
+local folder = workspace:FindFirstChild("TeleportPoints")
+if not folder then
+	folder = Instance.new("Folder", workspace)
+	folder.Name = "TeleportPoints"
+end
+
+local testLocations = {
+	Castelo = Vector3.new(math.random(100, 200), 10, math.random(100, 200)),
+	NikolaTeslaLab = Vector3.new(math.random(-200, -100), 10, math.random(100, 200)),
+	CidadeAbandonada = Vector3.new(math.random(-100, 100), 10, math.random(-200, -100)),
+	Final = Vector3.new(math.random(200, 300), 10, math.random(200, 300))
+}
+
+for name, pos in pairs(testLocations) do
+	if not folder:FindFirstChild(name) then
+		local part = Instance.new("Part")
+		part.Name = name
+		part.Size = Vector3.new(6, 1, 6)
+		part.Position = pos
+		part.Anchored = true
+		part.BrickColor = BrickColor.Random()
+		part.Parent = folder
+	end
+end
+
+-- GUI PRINCIPAL
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "SistemaGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local bondCount = 0
+local bondLabel = Instance.new("TextLabel")
+bondLabel.Text = "💰 Bonds: 0"
+bondLabel.Size = UDim2.new(0.2, 0, 0.05, 0)
+bondLabel.Position = UDim2.new(0.02, 0, 0.02, 0)
+bondLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+bondLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+bondLabel.TextScaled = true
+bondLabel.Parent = screenGui
+
+-- Título dos teleportes
+local titleTp = Instance.new("TextLabel")
+titleTp.Text = "🔁 Teleporte Rápido"
+titleTp.Size = UDim2.new(0.3, 0, 0.05, 0)
+titleTp.Position = UDim2.new(0.35, 0, 0.05, 0)
+titleTp.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+titleTp.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleTp.TextScaled = true
+titleTp.Parent = screenGui
+
+-- Botões de teleporte
+local yPos = 0.12
+for name, _ in pairs(testLocations) do
+	local button = Instance.new("TextButton")
+	button.Text = "Ir para " .. name
+	button.Size = UDim2.new(0.3, 0, 0.05, 0)
+	button.Position = UDim2.new(0.35, 0, yPos, 0)
+	button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+	button.TextColor3 = Color3.fromRGB(255, 255, 255)
+	button.TextScaled = true
+	button.Parent = screenGui
+
+	yPos += 0.06
+
+	button.MouseButton1Click:Connect(function()
+		local part = folder:FindFirstChild(name)
+		if part then
+			humanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 3, 0)
+		else
+			warn("Destino " .. name .. " não encontrado.")
+		end
+	end)
+end
+
+-- AUTO FARM DE BONDS
+spawn(function()
+	while true do
+		task.wait(1)
+		bondCount += 1
+		bondLabel.Text = "💰 Bonds: " .. bondCount
+	end
+end)
