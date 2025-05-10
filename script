@@ -1,297 +1,212 @@
---[[
-Script for Dead Rails with Aimbot, Killaura, Item Teleport, and Key System
-Includes: Fly, Noclip, ESP, Infinite Health, Infinite Fuel, Aimbot, Killaura, Item Teleport
-]]
+-- Zenin Hub - Blox Fruits Completo
+-- Inclui: ESP de Frutas, ESP de Baús, Auto Coletar, Auto Farm Boss, GUI com abas
 
--- Protection
-local CoreGui = game:GetService("CoreGui")
-local function safeGuiParent()
-    return (gethui and gethui()) or CoreGui
+-- Serviços
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+-- GUI Principal
+local ScreenGui = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
+ScreenGui.Name = "ZeninHub_BloxFruit"
+
+local frame = Instance.new("Frame", ScreenGui)
+frame.Size = UDim2.new(0, 300, 0, 400)
+frame.Position = UDim2.new(0, 10, 0, 10)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+frame.BorderSizePixel = 0
+
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Text = "Zenin Hub - Blox Fruits"
+title.TextSize = 20
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+
+local tabFrame = Instance.new("Frame", frame)
+tabFrame.Size = UDim2.new(0, 300, 0, 40)
+tabFrame.Position = UDim2.new(0, 0, 0, 40)
+tabFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+
+local contentFrame = Instance.new("Frame", frame)
+contentFrame.Size = UDim2.new(1, 0, 0, 320)
+contentFrame.Position = UDim2.new(0, 0, 0, 80)
+contentFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+
+local tabs = {
+    "Race V4", "Dungeon", "Boss Farm", "Teleport", "Buy Item", "Fruits", "Stats", "Misc"
+}
+
+local function clearContent()
+    for _, child in ipairs(contentFrame:GetChildren()) do
+        child:Destroy()
+    end
 end
 
-if safeGuiParent():FindFirstChild("DR_GUI_6659") then
-    safeGuiParent()["DR_GUI_6659"]:Destroy()
+local function createInfo(text)
+    local label = Instance.new("TextLabel", contentFrame)
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.Text = text
+    label.TextWrapped = true
+    label.TextSize = 16
+    label.TextColor3 = Color3.new(1, 1, 1)
+    label.BackgroundTransparency = 1
 end
 
--- Key GUI
-local KeyGui = Instance.new("ScreenGui")
-KeyGui.Name = "DR_GUI_6659"
-KeyGui.Parent = safeGuiParent()
-KeyGui.ResetOnSpawn = false
+-- ========== ESP DE BAÚ ==========
+local function createChestESP()
+    for _, v in pairs(workspace:GetChildren()) do
+        if v:IsA("Model") and v:FindFirstChild("TouchInterest") and v.Name:lower():find("chest") then
+            if not v:FindFirstChild("ChestESP") then
+                local esp = Instance.new("BillboardGui", v)
+                esp.Name = "ChestESP"
+                esp.Size = UDim2.new(0, 100, 0, 40)
+                esp.AlwaysOnTop = true
+                esp.StudsOffset = Vector3.new(0, 2, 0)
 
-local KeyFrame = Instance.new("Frame")
-KeyFrame.Size = UDim2.new(0, 300, 0, 200)
-KeyFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
-KeyFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-KeyFrame.BorderSizePixel = 0
-KeyFrame.Parent = KeyGui
-
-local KeyTitle = Instance.new("TextLabel")
-KeyTitle.Size = UDim2.new(1, 0, 0, 40)
-KeyTitle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-KeyTitle.Text = "🔐 Insert the Key to unlock"
-KeyTitle.TextColor3 = Color3.new(1, 1, 1)
-KeyTitle.TextSize = 18
-KeyTitle.Parent = KeyFrame
-
-local KeyBox = Instance.new("TextBox")
-KeyBox.Size = UDim2.new(0.8, 0, 0, 30)
-KeyBox.Position = UDim2.new(0.1, 0, 0, 60)
-KeyBox.PlaceholderText = "Enter the key here..."
-KeyBox.Text = ""
-KeyBox.TextSize = 16
-KeyBox.TextColor3 = Color3.new(1, 1, 1)
-KeyBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-KeyBox.Parent = KeyFrame
-
-local CopyBtn = Instance.new("TextButton")
-CopyBtn.Size = UDim2.new(0.8, 0, 0, 30)
-CopyBtn.Position = UDim2.new(0.1, 0, 0, 100)
-CopyBtn.Text = "🔗 Get Key"
-CopyBtn.TextSize = 16
-CopyBtn.TextColor3 = Color3.new(1, 1, 1)
-CopyBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-CopyBtn.Parent = KeyFrame
-CopyBtn.MouseButton1Click:Connect(function()
-    setclipboard("https://direct-link.net/1348607/script-for-dead-rails")
-    game:GetService("StarterGui"):SetCore("SendNotification", {
-        Title = "Link Copied!",
-        Text = "The link has been copied to the clipboard.",
-        Duration = 3
-    })
-end)
-
-local EnviarBtn = Instance.new("TextButton")
-EnviarBtn.Size = UDim2.new(0.8, 0, 0, 30)
-EnviarBtn.Position = UDim2.new(0.1, 0, 0, 140)
-EnviarBtn.Text = "✅ Submit Key"
-EnviarBtn.TextSize = 16
-EnviarBtn.TextColor3 = Color3.new(1, 1, 1)
-EnviarBtn.BackgroundColor3 = Color3.fromRGB(40, 130, 40)
-EnviarBtn.Parent = KeyFrame
-
--- Fade In Effect
-KeyFrame.BackgroundTransparency = 1
-game:GetService("TweenService"):Create(KeyFrame, TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {BackgroundTransparency = 0}):Play()
-
-EnviarBtn.MouseButton1Click:Connect(function()
-    if KeyBox.Text:lower() == "rbx344423" then
-        -- Remove key window
-        KeyFrame.Visible = false
-        wait(0.5)
-        
-        -- Main Menu
-        local MainFrame = Instance.new("Frame")
-        MainFrame.Size = UDim2.new(0, 300, 0, 400)
-        MainFrame.Position = UDim2.new(0, 50, 0.5, -200)
-        MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-        MainFrame.BorderSizePixel = 0
-        MainFrame.Parent = KeyGui
-
-        local Title = Instance.new("TextLabel")
-        Title.Size = UDim2.new(1, 0, 0, 40)
-        Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        Title.Text = "🛠️ Dead Rails Menu"
-        Title.TextColor3 = Color3.new(1, 1, 1)
-        Title.TextSize = 20
-        Title.Parent = MainFrame
-
-        local function createButton(name, order, callback)
-            local btn = Instance.new("TextButton")
-            btn.Size = UDim2.new(1, -20, 0, 30)
-            btn.Position = UDim2.new(0, 10, 0, 50 + (order - 1) * 35)
-            btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-            btn.TextColor3 = Color3.new(1, 1, 1)
-            btn.Text = name
-            btn.TextSize = 16
-            btn.Parent = MainFrame
-
-            -- Animation Effect (fade in)
-            btn.TextTransparency = 1
-            game:GetService("TweenService"):Create(btn, TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {TextTransparency = 0}):Play()
-            
-            -- Button Zoom Animation
-            btn.MouseEnter:Connect(function()
-                game:GetService("TweenService"):Create(btn, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Size = UDim2.new(1, -20, 0, 40)}):Play()
-            end)
-            btn.MouseLeave:Connect(function()
-                game:GetService("TweenService"):Create(btn, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Size = UDim2.new(1, -20, 0, 30)}):Play()
-            end)
-
-            btn.MouseButton1Click:Connect(callback)
-        end
-
-        -- Infinite Health System
-        local player = game.Players.LocalPlayer
-        local character = player.Character or player.CharacterAdded:Wait()
-        local humanoid = character:WaitForChild("Humanoid")
-        
-        humanoid.HealthChanged:Connect(function()
-            if humanoid.Health < humanoid.MaxHealth then
-                humanoid.Health = humanoid.MaxHealth
-            end
-        end)
-
-        -- Infinite Fuel System (Train)
-        local function activateInfiniteFuel()
-            local train = character:FindFirstChild("Train") -- Assuming the train is a model named "Train"
-            if train then
-                local fuel = train:FindFirstChild("Fuel") -- Assuming the train's fuel is controlled by this attribute
-                if fuel then
-                    fuel.Value = math.huge -- Infinite fuel
-                end
+                local label = Instance.new("TextLabel", esp)
+                label.Size = UDim2.new(1, 0, 1, 0)
+                label.BackgroundTransparency = 1
+                label.Text = "💰 CHEST 💰"
+                label.TextColor3 = Color3.fromRGB(255, 215, 0)
+                label.TextScaled = true
+                label.Font = Enum.Font.GothamBold
             end
         end
+    end
+end
 
-        -- Infinite Energy System
-        local function activateInfiniteEnergy()
-            -- Assuming energy is controlled similarly to fuel
-            local energy = character:FindFirstChild("Energy") -- Example of energy
-            if energy then
-                energy.Value = math.huge -- Infinite energy
-            end
+-- ========== ESP DE FRUTAS ==========
+local function createFruitESP()
+    for _, fruit in pairs(workspace:GetChildren()) do
+        if fruit:IsA("Tool") and fruit:FindFirstChild("Handle") and not fruit:FindFirstChild("FruitESP") then
+            local billboard = Instance.new("BillboardGui", fruit.Handle)
+            billboard.Name = "FruitESP"
+            billboard.Size = UDim2.new(0, 100, 0, 40)
+            billboard.AlwaysOnTop = true
+            billboard.StudsOffset = Vector3.new(0, 2, 0)
+
+            local text = Instance.new("TextLabel", billboard)
+            text.Size = UDim2.new(1, 0, 1, 0)
+            text.BackgroundTransparency = 1
+            text.Text = "🍏 FRUIT 🍏"
+            text.TextColor3 = Color3.fromRGB(0, 255, 127)
+            text.TextScaled = true
+            text.Font = Enum.Font.GothamBold
         end
+    end
+end
 
-        -- Activate infinite fuel and energy systems
-        activateInfiniteFuel()
-        activateInfiniteEnergy()
-
-        -- Create buttons in the menu
-        createButton("Activate Aimbot", 1, function()
-            -- Aimbot System
-            local aimbot = true
-            while aimbot do
-                wait(0.1)
-                local nearestEnemy = nil
-                local shortestDistance = math.huge
-                for _, enemy in pairs(game.Players:GetPlayers()) do
-                    if enemy ~= player and enemy.Character and enemy.Character:FindFirstChild("HumanoidRootPart") then
-                        local distance = (enemy.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).magnitude
-                        if distance < shortestDistance then
-                            nearestEnemy = enemy
-                            shortestDistance = distance
-                        end
-                    end
-                end
-                if nearestEnemy then
-                    local targetPos = nearestEnemy.Character.HumanoidRootPart.Position
-                    -- Rotate the player's camera towards the enemy
-                    workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, targetPos)
-                end
-            end
-        end)
-
-        createButton("Activate Killaura", 2, function()
-            -- Killaura System (attack nearby enemies)
-            local killaura = true
-            while killaura do
-                wait(0.1)
-                local nearestEnemy = nil
-                local shortestDistance = 10
-                for _, enemy in pairs(game.Players:GetPlayers()) do
-                    if enemy ~= player and enemy.Character and enemy.Character:FindFirstChild("Humanoid") then
-                        local distance = (enemy.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).magnitude
-                        if distance < shortestDistance then
-                            nearestEnemy = enemy
-                            shortestDistance = distance
-                        end
-                    end
-                end
-                if nearestEnemy then
-                    local enemyHumanoid = nearestEnemy.Character:FindFirstChild("Humanoid")
-                    if enemyHumanoid then
-                        enemyHumanoid:TakeDamage(10) -- Example damage value
-                    end
-                end
-            end
-        end)
-
-        createButton("Activate Noclip", 3, function()
-            -- Noclip System
-            local noclip = false
-            local function toggleNoclip()
-                noclip = not noclip
-                if noclip then
-                    character:FindFirstChild("Humanoid").RootPart.CanCollide = false
-                    while noclip do
-                        wait(0.1)
-                        character:FindFirstChild("Humanoid").RootPart.CFrame = character:FindFirstChild("Humanoid").RootPart.CFrame + character:FindFirstChild("Humanoid").RootPart.Velocity
-                    end
-                else
-                    character:FindFirstChild("Humanoid").RootPart.CanCollide = true
-                end
-            end
-            toggleNoclip()
-        end)
-
-        createButton("Activate Fly", 4, function()
-            -- Fly System
-            local flySpeed = 50
-            local flying = false
-            local function startFly()
-                flying = true
-                while flying do
-                    wait(0.1)
-                    character:FindFirstChild("Humanoid").RootPart.Velocity = Vector3.new(0, flySpeed, 0)
-                end
-            end
-            local function stopFly()
-                flying = false
-            end
-
-            -- Toggle Fly
-            if not flying then
-                startFly()
-            else
-                stopFly()
-            end
-        end)
-
-        createButton("Activate ESP", 5, function()
-            -- ESP System
-            local esp = true
-            while esp do
-                wait(0.5)
-                for _, enemy in pairs(game.Players:GetPlayers()) do
-                    if enemy.Character and enemy.Character:FindFirstChild("HumanoidRootPart") then
-                        local espPart = Instance.new("BillboardGui")
-                        espPart.Size = UDim2.new(0, 100, 0, 50)
-                        espPart.Adornee = enemy.Character.HumanoidRootPart
-                        espPart.StudsOffset = Vector3.new(0, 2, 0)
-                        espPart.Parent = enemy.Character
-                        local textLabel = Instance.new("TextLabel")
-                        textLabel.Size = UDim2.new(1, 0, 1, 0)
-                        textLabel.Text = enemy.Name
-                        textLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
-                        textLabel.TextSize = 16
-                        textLabel.BackgroundTransparency = 1
-                        textLabel.Parent = espPart
-                    end
-                end
-            end
-        end)
-
-        createButton("Teleport Items", 6, function()
-            -- Item Teleport System
-            local function teleportItem(itemName)
-                for _, item in pairs(workspace:GetChildren()) do
-                    if item.Name:lower() == itemName:lower() then
-                        item.CFrame = player.Character.HumanoidRootPart.CFrame
-                    end
-                end
-            end
-
-            -- Teleport specific items
-            teleportItem("GoldBar")
-            teleportItem("IronBar")
-        end)
-
-    else
-        game:GetService("StarterGui"):SetCore("SendNotification", {
-            Title = "Invalid Key!",
-            Text = "The key you entered is incorrect.",
-            Duration = 3
-        })
+-- Atualizar ESPs
+task.spawn(function()
+    while task.wait(5) do
+        pcall(createChestESP)
+        pcall(createFruitESP)
     end
 end)
 
+-- Auto Coleta de Baú
+local function autoCollectChests()
+    for _, v in pairs(workspace:GetChildren()) do
+        if v:IsA("Model") and v:FindFirstChild("TouchInterest") and v.Name:lower():find("chest") then
+            local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = v:GetModelCFrame()
+                wait(0.2)
+            end
+        end
+    end
+end
+
+-- Auto Coleta de Frutas
+local function autoCollectFruits()
+    for _, fruit in pairs(workspace:GetChildren()) do
+        if fruit:IsA("Tool") and fruit:FindFirstChild("Handle") then
+            local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = fruit.Handle.CFrame
+                wait(0.2)
+            end
+        end
+    end
+end
+
+-- Ativação automática
+task.spawn(function()
+    while task.wait(10) do
+        pcall(autoCollectChests)
+        pcall(autoCollectFruits)
+    end
+end)
+
+-- ========== AUTO FARM BOSS ==========
+local function getBoss()
+    for _, npc in pairs(workspace.Enemies:GetChildren()) do
+        if npc:FindFirstChild("Humanoid") and npc.Humanoid.Health > 0 and npc:FindFirstChild("Head") then
+            if string.find(npc.Name, "Boss") or npc.Name == "Saber Expert" or npc.Name == "Ice Admiral" or npc.Name == "Darkbeard" or npc.Name == "Cake Queen" then
+                return npc
+            end
+        end
+    end
+end
+
+local function attackBoss(boss)
+    while boss and boss.Parent and boss:FindFirstChild("Humanoid") and boss.Humanoid.Health > 0 do
+        local root = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if root and boss:FindFirstChild("HumanoidRootPart") then
+            root.CFrame = boss.HumanoidRootPart.CFrame * CFrame.new(0, 5, 5)
+        end
+        for _, v in pairs(LocalPlayer.Backpack:GetChildren()) do
+            if v:IsA("Tool") then
+                LocalPlayer.Character.Humanoid:EquipTool(v)
+            end
+        end
+        mouse1click()
+        task.wait(0.2)
+    end
+end
+
+task.spawn(function()
+    while task.wait(1) do
+        local boss = getBoss()
+        if boss then
+            attackBoss(boss)
+        end
+    end
+end)
+
+-- ========== TABS ==========
+for i, name in ipairs(tabs) do
+    local button = Instance.new("TextButton", tabFrame)
+    button.Size = UDim2.new(1 / #tabs, 0, 1, 0)
+    button.Position = UDim2.new((i - 1) / #tabs, 0, 0, 0)
+    button.Text = name
+    button.TextSize = 14
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+    button.BorderSizePixel = 0
+    button.MouseButton1Click:Connect(function()
+        clearContent()
+        if name == "Race V4" then
+            createInfo("Race V4: desbloqueável via missões no Temple of Time.")
+        elseif name == "Dungeon" then
+            createInfo("Dungeons: enfrente inimigos e ganhe fragmentos.")
+        elseif name == "Boss Farm" then
+            createInfo("Auto Farm Boss ativo! Teleporta e ataca bosses automaticamente.")
+        elseif name == "Teleport" then
+            createInfo("(Futuro recurso) Teleporte entre ilhas.")
+        elseif name == "Buy Item" then
+            createInfo("(Futuro recurso) Compra de itens automática.")
+        elseif name == "Fruits" then
+            createInfo("ESP + Auto Coletar de Frutas ativado!")
+        elseif name == "Stats" then
+            createInfo("(Futuro recurso) Distribuição automática de pontos.")
+        elseif name == "Misc" then
+            createInfo("ESP de Baú e Auto Coleta ativados.")
+        end
+    end)
+end
+
+print("Zenin Hub completo carregado.")
