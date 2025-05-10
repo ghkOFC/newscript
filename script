@@ -1,143 +1,169 @@
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
-
-local KEY_CORRETA = "baitola"
-local autorizado = false
-
--- GUI de verificação de key
-local keyGui = Instance.new("ScreenGui", playerGui)
-keyGui.Name = "KeySystem"
-
-local frame = Instance.new("Frame", keyGui)
-frame.Size = UDim2.new(0.3, 0, 0.25, 0)
-frame.Position = UDim2.new(0.35, 0, 0.35, 0)
-frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-frame.BorderSizePixel = 0
-
-local title = Instance.new("TextLabel", frame)
-title.Text = "🔐 Digite a key para continuar"
-title.Size = UDim2.new(1, 0, 0.3, 0)
-title.BackgroundTransparency = 1
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.TextScaled = true
-
-local textBox = Instance.new("TextBox", frame)
-textBox.PlaceholderText = "Digite a key aqui..."
-textBox.Size = UDim2.new(0.9, 0, 0.3, 0)
-textBox.Position = UDim2.new(0.05, 0, 0.35, 0)
-textBox.TextScaled = true
-textBox.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-textBox.TextColor3 = Color3.new(1, 1, 1)
-
-local confirmar = Instance.new("TextButton", frame)
-confirmar.Text = "🔓 Confirmar"
-confirmar.Size = UDim2.new(0.6, 0, 0.2, 0)
-confirmar.Position = UDim2.new(0.2, 0, 0.7, 0)
-confirmar.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
-confirmar.TextColor3 = Color3.new(1, 1, 1)
-confirmar.TextScaled = true
-
-confirmar.MouseButton1Click:Connect(function()
-	if textBox.Text == KEY_CORRETA then
-		autorizado = true
-		keyGui:Destroy()
-	else
-		textBox.Text = ""
-		textBox.PlaceholderText = "❌ Key incorreta. Tente novamente"
-	end
-end)
-
--- Aguarda a key ser correta
-while not autorizado do
-	task.wait()
-end
-
--- CONTINUAÇÃO: funcionalidades desbloqueadas após key
+-- Variáveis principais
+local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
+local humanoid = character:WaitForChild("Humanoid")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local teleportButtonClicked = false
 
--- CRIA TELEPORTES PARA TESTE
-local folder = workspace:FindFirstChild("TeleportPoints")
-if not folder then
-	folder = Instance.new("Folder", workspace)
-	folder.Name = "TeleportPoints"
+-- Funções do Fly
+local flying = false
+local speed = 50
+local bodyVelocity = nil
+local bodyGyro = nil
+
+-- Função de Fly
+local function toggleFly()
+    flying = not flying
+    if flying then
+        bodyVelocity = Instance.new("BodyVelocity")
+        bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
+        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
+        bodyVelocity.Parent = character.HumanoidRootPart
+
+        bodyGyro = Instance.new("BodyGyro")
+        bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
+        bodyGyro.CFrame = character.HumanoidRootPart.CFrame
+        bodyGyro.Parent = character.HumanoidRootPart
+    else
+        if bodyVelocity then
+            bodyVelocity:Destroy()
+            bodyVelocity = nil
+        end
+        if bodyGyro then
+            bodyGyro:Destroy()
+            bodyGyro = nil
+        end
+    end
 end
 
-local testLocations = {
-	Castelo = Vector3.new(math.random(100, 200), 10, math.random(100, 200)),
-	NikolaTeslaLab = Vector3.new(math.random(-200, -100), 10, math.random(100, 200)),
-	CidadeAbandonada = Vector3.new(math.random(-100, 100), 10, math.random(-200, -100)),
-	Final = Vector3.new(math.random(200, 300), 10, math.random(200, 300))
-}
+-- Função de controle de movimento do Fly
+local function moveFly()
+    if flying then
+        local direction = Vector3.new(0, 0, 0)
 
-for name, pos in pairs(testLocations) do
-	if not folder:FindFirstChild(name) then
-		local part = Instance.new("Part")
-		part.Name = name
-		part.Size = Vector3.new(6, 1, 6)
-		part.Position = pos
-		part.Anchored = true
-		part.BrickColor = BrickColor.Random()
-		part.Parent = folder
-	end
+        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+            direction = direction + character.HumanoidRootPart.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+            direction = direction - character.HumanoidRootPart.CFrame.LookVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+            direction = direction - character.HumanoidRootPart.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+            direction = direction + character.HumanoidRootPart.CFrame.RightVector
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+            direction = direction + Vector3.new(0, 1, 0)
+        end
+        if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+            direction = direction - Vector3.new(0, 1, 0)
+        end
+
+        bodyVelocity.Velocity = direction.Unit * speed
+    end
 end
 
--- GUI PRINCIPAL
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "SistemaGUI"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = playerGui
-
-local bondCount = 0
-local bondLabel = Instance.new("TextLabel")
-bondLabel.Text = "💰 Bonds: 0"
-bondLabel.Size = UDim2.new(0.2, 0, 0.05, 0)
-bondLabel.Position = UDim2.new(0.02, 0, 0.02, 0)
-bondLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-bondLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-bondLabel.TextScaled = true
-bondLabel.Parent = screenGui
-
--- Título dos teleportes
-local titleTp = Instance.new("TextLabel")
-titleTp.Text = "🔁 Teleporte Rápido"
-titleTp.Size = UDim2.new(0.3, 0, 0.05, 0)
-titleTp.Position = UDim2.new(0.35, 0, 0.05, 0)
-titleTp.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-titleTp.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleTp.TextScaled = true
-titleTp.Parent = screenGui
-
--- Botões de teleporte
-local yPos = 0.12
-for name, _ in pairs(testLocations) do
-	local button = Instance.new("TextButton")
-	button.Text = "Ir para " .. name
-	button.Size = UDim2.new(0.3, 0, 0.05, 0)
-	button.Position = UDim2.new(0.35, 0, yPos, 0)
-	button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
-	button.TextColor3 = Color3.fromRGB(255, 255, 255)
-	button.TextScaled = true
-	button.Parent = screenGui
-
-	yPos += 0.06
-
-	button.MouseButton1Click:Connect(function()
-		local part = folder:FindFirstChild(name)
-		if part then
-			humanoidRootPart.CFrame = part.CFrame + Vector3.new(0, 3, 0)
-		else
-			warn("Destino " .. name .. " não encontrado.")
-		end
-	end)
-end
-
--- AUTO FARM DE BONDS
-spawn(function()
-	while true do
-		task.wait(1)
-		bondCount += 1
-		bondLabel.Text = "💰 Bonds: " .. bondCount
-	end
+-- Monitoramento de teclas para Fly
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.F then
+        toggleFly()
+    end
 end)
+
+RunService.Heartbeat:Connect(function()
+    moveFly()
+end)
+
+-- Sistema de Teleporte Aleatório
+local function teleportToRandomLocation()
+    local locations = {
+        Vector3.new(math.random(-100, 100), 10, math.random(-100, 100)), -- Castelo
+        Vector3.new(math.random(-100, 100), 10, math.random(-100, 100)), -- Nikola Tesla Lab
+        Vector3.new(math.random(-100, 100), 10, math.random(-100, 100)), -- Cidade Abandonada
+        Vector3.new(math.random(-100, 100), 10, math.random(-100, 100))  -- Final
+    }
+    
+    local selectedLocation = locations[math.random(1, #locations)]
+    character:SetPrimaryPartCFrame(CFrame.new(selectedLocation))
+end
+
+-- Sistema de Key para usar
+local key = "baitola"  -- Senha fixa
+local userKeyInput = ""
+
+local function checkKey()
+    if userKeyInput == key then
+        teleportToRandomLocation()
+    else
+        print("Chave incorreta!")
+    end
+end
+
+-- Interface Gráfica para Key
+local screenGui = Instance.new("ScreenGui", player.PlayerGui)
+local textBox = Instance.new("TextBox", screenGui)
+textBox.Size = UDim2.new(0, 200, 0, 50)
+textBox.Position = UDim2.new(0.5, -100, 0.5, -25)
+textBox.PlaceholderText = "Digite a chave..."
+textBox.TextChanged:Connect(function()
+    userKeyInput = textBox.Text
+end)
+
+local submitButton = Instance.new("TextButton", screenGui)
+submitButton.Size = UDim2.new(0, 200, 0, 50)
+submitButton.Position = UDim2.new(0.5, -100, 0.5, 25)
+submitButton.Text = "Submeter"
+submitButton.MouseButton1Click:Connect(function()
+    checkKey()
+end)
+
+-- Botão para copiar link
+local copyButton = Instance.new("TextButton", screenGui)
+copyButton.Size = UDim2.new(0, 200, 0, 50)
+copyButton.Position = UDim2.new(0.5, -100, 0.5, 75)
+copyButton.Text = "Get Key"
+copyButton.MouseButton1Click:Connect(function()
+    setclipboard("https://loot-link.com/s?KCyoj6LG")
+end)
+
+-- Script para ativar e desativar a janela
+local toggleButton = Instance.new("TextButton", screenGui)
+toggleButton.Size = UDim2.new(0, 50, 0, 50)
+toggleButton.Position = UDim2.new(0, 10, 0, 10)
+toggleButton.Text = "DR"  -- Texto representando Dead Rails
+toggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+
+local minimized = false
+toggleButton.MouseButton1Click:Connect(function()
+    if minimized then
+        screenGui.Enabled = true
+    else
+        screenGui.Enabled = false
+    end
+    minimized = not minimized
+end)
+
+-- ESP de itens (Exemplo básico)
+local function createESP(part)
+    local esp = Instance.new("BillboardGui")
+    esp.Adornee = part
+    esp.Size = UDim2.new(0, 100, 0, 50)
+    esp.StudsOffset = Vector3.new(0, 3, 0)
+    esp.Parent = part
+
+    local textLabel = Instance.new("TextLabel", esp)
+    textLabel.Text = "Item!"
+    textLabel.Size = UDim2.new(1, 0, 1, 0)
+    textLabel.BackgroundTransparency = 1
+    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+end
+
+-- Exemplo: Adicionando ESP a um item
+for _, item in pairs(workspace:GetChildren()) do
+    if item:IsA("Part") then
+        createESP(item)
+    end
+end
