@@ -90,58 +90,72 @@ local function teleportToRandomLocation()
     character:SetPrimaryPartCFrame(CFrame.new(selectedLocation))
 end
 
--- Sistema de Key para usar
-local key = "baitola"  -- Senha fixa
-local userKeyInput = ""
-
-local function checkKey()
-    if userKeyInput == key then
-        teleportToRandomLocation()
-    else
-        print("Chave incorreta!")
-    end
-end
-
--- Interface Gráfica para Key
+-- Interface Gráfica para o Jogo
 local screenGui = Instance.new("ScreenGui", player.PlayerGui)
-local textBox = Instance.new("TextBox", screenGui)
-textBox.Size = UDim2.new(0, 200, 0, 50)
-textBox.Position = UDim2.new(0.5, -100, 0.5, -25)
-textBox.PlaceholderText = "Digite a chave..."
-textBox.TextChanged:Connect(function()
-    userKeyInput = textBox.Text
+screenGui.Name = "GameInterface"
+
+-- Fundo de tela
+local background = Instance.new("Frame", screenGui)
+background.Size = UDim2.new(0, 300, 0, 500)
+background.Position = UDim2.new(0.5, -150, 0.5, -250)
+background.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+background.BackgroundTransparency = 0.2
+background.BorderSizePixel = 0
+background.Visible = true
+
+-- Título do painel
+local titleLabel = Instance.new("TextLabel", background)
+titleLabel.Text = "Menu de Jogo"
+titleLabel.Size = UDim2.new(0, 300, 0, 50)
+titleLabel.Position = UDim2.new(0, 0, 0, 0)
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+titleLabel.TextScaled = true
+titleLabel.Font = Enum.Font.GothamBold
+
+-- Botão para teleportar
+local teleportButton = Instance.new("TextButton", background)
+teleportButton.Size = UDim2.new(0, 260, 0, 50)
+teleportButton.Position = UDim2.new(0, 20, 0, 70)
+teleportButton.Text = "Teleportar Aleatório"
+teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+teleportButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
+teleportButton.Font = Enum.Font.Gotham
+teleportButton.TextSize = 20
+
+teleportButton.MouseButton1Click:Connect(function()
+    teleportToRandomLocation()
 end)
 
-local submitButton = Instance.new("TextButton", screenGui)
-submitButton.Size = UDim2.new(0, 200, 0, 50)
-submitButton.Position = UDim2.new(0.5, -100, 0.5, 25)
-submitButton.Text = "Submeter"
-submitButton.MouseButton1Click:Connect(function()
-    checkKey()
+-- Botão para ativar/desativar o voo
+local flyButton = Instance.new("TextButton", background)
+flyButton.Size = UDim2.new(0, 260, 0, 50)
+flyButton.Position = UDim2.new(0, 20, 0, 140)
+flyButton.Text = "Ativar/Desativar Voo"
+flyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+flyButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
+flyButton.Font = Enum.Font.Gotham
+flyButton.TextSize = 20
+
+flyButton.MouseButton1Click:Connect(function()
+    toggleFly()
 end)
 
--- Botão para copiar link
-local copyButton = Instance.new("TextButton", screenGui)
-copyButton.Size = UDim2.new(0, 200, 0, 50)
-copyButton.Position = UDim2.new(0.5, -100, 0.5, 75)
-copyButton.Text = "Get Key"
-copyButton.MouseButton1Click:Connect(function()
-    setclipboard("https://loot-link.com/s?KCyoj6LG")
-end)
-
--- Script para ativar e desativar a janela
+-- Botão para minimizar/maximizar a interface
 local toggleButton = Instance.new("TextButton", screenGui)
 toggleButton.Size = UDim2.new(0, 50, 0, 50)
 toggleButton.Position = UDim2.new(0, 10, 0, 10)
-toggleButton.Text = "DR"  -- Texto representando Dead Rails
+toggleButton.Text = "DR"
 toggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+toggleButton.Font = Enum.Font.GothamBold
+toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 
 local minimized = false
 toggleButton.MouseButton1Click:Connect(function()
     if minimized then
-        screenGui.Enabled = true
+        background.Visible = true
     else
-        screenGui.Enabled = false
+        background.Visible = false
     end
     minimized = not minimized
 end)
