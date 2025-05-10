@@ -1,183 +1,219 @@
--- Variáveis principais
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
-local teleportButtonClicked = false
+--[[ 
+Script para Dead Rails com Sistema de Key
+Inclui: Fly, Noclip, ESP, Teleporte, Vida Infinita, Combustível Infinito, Energia Infinita, Trem
+]]
 
--- Funções do Fly
-local flying = false
-local speed = 50
-local bodyVelocity = nil
-local bodyGyro = nil
+-- Proteção
+local CoreGui = game:GetService("CoreGui")
+local function safeGuiParent()
+    return (gethui and gethui()) or CoreGui
+end
 
--- Função de Fly
-local function toggleFly()
-    flying = not flying
-    if flying then
-        bodyVelocity = Instance.new("BodyVelocity")
-        bodyVelocity.MaxForce = Vector3.new(400000, 400000, 400000)
-        bodyVelocity.Velocity = Vector3.new(0, 0, 0)
-        bodyVelocity.Parent = character.HumanoidRootPart
+if safeGuiParent():FindFirstChild("DR_GUI_6659") then
+    safeGuiParent()["DR_GUI_6659"]:Destroy()
+end
 
-        bodyGyro = Instance.new("BodyGyro")
-        bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
-        bodyGyro.CFrame = character.HumanoidRootPart.CFrame
-        bodyGyro.Parent = character.HumanoidRootPart
+-- GUI de Key
+local KeyGui = Instance.new("ScreenGui")
+KeyGui.Name = "DR_GUI_6659"
+KeyGui.Parent = safeGuiParent()
+KeyGui.ResetOnSpawn = false
+
+local KeyFrame = Instance.new("Frame")
+KeyFrame.Size = UDim2.new(0, 300, 0, 200)
+KeyFrame.Position = UDim2.new(0.5, -150, 0.5, -100)
+KeyFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+KeyFrame.BorderSizePixel = 0
+KeyFrame.Parent = KeyGui
+
+local KeyTitle = Instance.new("TextLabel")
+KeyTitle.Size = UDim2.new(1, 0, 0, 40)
+KeyTitle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+KeyTitle.Text = "🔐 Insira a Key para desbloquear"
+KeyTitle.TextColor3 = Color3.new(1, 1, 1)
+KeyTitle.TextSize = 18
+KeyTitle.Parent = KeyFrame
+
+local KeyBox = Instance.new("TextBox")
+KeyBox.Size = UDim2.new(0.8, 0, 0, 30)
+KeyBox.Position = UDim2.new(0.1, 0, 0, 60)
+KeyBox.PlaceholderText = "Digite a key aqui..."
+KeyBox.Text = ""
+KeyBox.TextSize = 16
+KeyBox.TextColor3 = Color3.new(1, 1, 1)
+KeyBox.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+KeyBox.Parent = KeyFrame
+
+local CopyBtn = Instance.new("TextButton")
+CopyBtn.Size = UDim2.new(0.8, 0, 0, 30)
+CopyBtn.Position = UDim2.new(0.1, 0, 0, 100)
+CopyBtn.Text = "🔗 Obter Key"
+CopyBtn.TextSize = 16
+CopyBtn.TextColor3 = Color3.new(1, 1, 1)
+CopyBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+CopyBtn.Parent = KeyFrame
+CopyBtn.MouseButton1Click:Connect(function()
+    setclipboard("https://loot-link.com/s?KCyoj6LG")
+end)
+
+local EnviarBtn = Instance.new("TextButton")
+EnviarBtn.Size = UDim2.new(0.8, 0, 0, 30)
+EnviarBtn.Position = UDim2.new(0.1, 0, 0, 140)
+EnviarBtn.Text = "✅ Enviar Key"
+EnviarBtn.TextSize = 16
+EnviarBtn.TextColor3 = Color3.new(1, 1, 1)
+EnviarBtn.BackgroundColor3 = Color3.fromRGB(40, 130, 40)
+EnviarBtn.Parent = KeyFrame
+
+-- Efeito de Fade In
+KeyFrame.BackgroundTransparency = 1
+game:GetService("TweenService"):Create(KeyFrame, TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {BackgroundTransparency = 0}):Play()
+
+EnviarBtn.MouseButton1Click:Connect(function()
+    if KeyBox.Text:lower() == "baitola" then
+        -- Remove a janela de key
+        KeyFrame.Visible = false
+        wait(0.5)
+        
+        -- Menu Principal
+        local MainFrame = Instance.new("Frame")
+        MainFrame.Size = UDim2.new(0, 300, 0, 400)
+        MainFrame.Position = UDim2.new(0, 50, 0.5, -200)
+        MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        MainFrame.BorderSizePixel = 0
+        MainFrame.Parent = KeyGui
+
+        local Title = Instance.new("TextLabel")
+        Title.Size = UDim2.new(1, 0, 0, 40)
+        Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        Title.Text = "🛠️ Menu Dead Rails"
+        Title.TextColor3 = Color3.new(1, 1, 1)
+        Title.TextSize = 20
+        Title.Parent = MainFrame
+
+        local function criarBotao(nome, ordem, callback)
+            local btn = Instance.new("TextButton")
+            btn.Size = UDim2.new(1, -20, 0, 30)
+            btn.Position = UDim2.new(0, 10, 0, 50 + (ordem - 1) * 35)
+            btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            btn.TextColor3 = Color3.new(1, 1, 1)
+            btn.Text = nome
+            btn.TextSize = 16
+            btn.Parent = MainFrame
+
+            -- Efeito de Animação (fade in)
+            btn.TextTransparency = 1
+            game:GetService("TweenService"):Create(btn, TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {TextTransparency = 0}):Play()
+            
+            -- Animação do botão de Zoom
+            btn.MouseEnter:Connect(function()
+                game:GetService("TweenService"):Create(btn, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Size = UDim2.new(1, -20, 0, 40)}):Play()
+            end)
+            btn.MouseLeave:Connect(function()
+                game:GetService("TweenService"):Create(btn, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Size = UDim2.new(1, -20, 0, 30)}):Play()
+            end)
+
+            btn.MouseButton1Click:Connect(callback)
+        end
+
+        -- Sistema de Vida Infinita
+        local player = game.Players.LocalPlayer
+        local character = player.Character or player.CharacterAdded:Wait()
+        local humanoid = character:WaitForChild("Humanoid")
+        
+        humanoid.HealthChanged:Connect(function()
+            if humanoid.Health < humanoid.MaxHealth then
+                humanoid.Health = humanoid.MaxHealth
+            end
+        end)
+
+        -- Sistema de Combustível Infinito (Trem)
+        local function ativarCombustivelInfinito()
+            local trem = character:FindFirstChild("Train") -- Supondo que o trem é um modelo chamado "Train"
+            if trem then
+                local combustivel = trem:FindFirstChild("Fuel") -- Supondo que o combustível do trem é controlado por esse atributo
+                if combustivel then
+                    combustivel.Value = math.huge -- Combustível infinito
+                end
+            end
+        end
+
+        -- Sistema de Energia Infinita
+        local function ativarEnergiaInfinita()
+            -- Vamos assumir que a energia é controlada de forma similar ao combustível
+            local energia = character:FindFirstChild("Energia") -- Exemplo de energia
+            if energia then
+                energia.Value = math.huge -- Energia infinita
+            end
+        end
+
+        -- Ativar os sistemas de combustível e energia infinita
+        ativarCombustivelInfinito()
+        ativarEnergiaInfinita()
+
+        -- Criando os botões no menu
+        criarBotao("Ir para o Castelo", 1, function()
+            teleportar(Vector3.new(100, 10, 100))
+        end)
+
+        criarBotao("Ir para Cidade Abandonada", 2, function()
+            teleportar(Vector3.new(-150, 10, 200))
+        end)
+
+        criarBotao("Ir para o Laboratório", 3, function()
+            teleportar(Vector3.new(250, 10, -100))
+        end)
+
+        criarBotao("Ir para o Final", 4, function()
+            teleportar(Vector3.new(0, 10, 0))
+        end)
+
+        -- Botão para Fly
+        local flying = false
+        criarBotao("Ativar Fly", 5, function()
+            local player = game.Players.LocalPlayer
+            local char = player.Character or player.CharacterAdded:Wait()
+            local hrp = char:WaitForChild("HumanoidRootPart")
+            flying = not flying
+            if flying then
+                local bv = Instance.new("BodyVelocity")
+                bv.Name = "FlyVelocity"
+                bv.MaxForce = Vector3.new(1, 1, 1) * 1e9
+                bv.Velocity = Vector3.new(0, 50, 0)
+                bv.Parent = hrp
+            else
+                if hrp:FindFirstChild("FlyVelocity") then
+                    hrp:FindFirstChild("FlyVelocity"):Destroy()
+                end
+            end
+        end)
+
+        -- Botão para Noclip
+        local noclip = false
+        criarBotao("Ativar Noclip", 6, function()
+            noclip = not noclip
+            game:GetService("RunService").Stepped:Connect(function()
+                if noclip then
+                    for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+                        if v:IsA("BasePart") and v.CanCollide then
+                            v.CanCollide = false
+                        end
+                    end
+                end
+            end)
+        end)
+
+        -- Botão de Minimizar/Maximizar
+        local minimizado = false
+        criarBotao("Minimizar/Maximizar", 7, function()
+            for _, v in pairs(MainFrame:GetChildren()) do
+                if v:IsA("TextButton") or v:IsA("TextLabel") then
+                    if v ~= Title then v.Visible = not minimizado end
+                end
+            end
+            minimizado = not minimizado
+        end)
     else
-        if bodyVelocity then
-            bodyVelocity:Destroy()
-            bodyVelocity = nil
-        end
-        if bodyGyro then
-            bodyGyro:Destroy()
-            bodyGyro = nil
-        end
-    end
-end
-
--- Função de controle de movimento do Fly
-local function moveFly()
-    if flying then
-        local direction = Vector3.new(0, 0, 0)
-
-        if UserInputService:IsKeyDown(Enum.KeyCode.W) then
-            direction = direction + character.HumanoidRootPart.CFrame.LookVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.S) then
-            direction = direction - character.HumanoidRootPart.CFrame.LookVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.A) then
-            direction = direction - character.HumanoidRootPart.CFrame.RightVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.D) then
-            direction = direction + character.HumanoidRootPart.CFrame.RightVector
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-            direction = direction + Vector3.new(0, 1, 0)
-        end
-        if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
-            direction = direction - Vector3.new(0, 1, 0)
-        end
-
-        bodyVelocity.Velocity = direction.Unit * speed
-    end
-end
-
--- Monitoramento de teclas para Fly
-UserInputService.InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.F then
-        toggleFly()
+        KeyBox.Text = "❌ Key incorreta"
     end
 end)
-
-RunService.Heartbeat:Connect(function()
-    moveFly()
-end)
-
--- Sistema de Teleporte Aleatório
-local function teleportToRandomLocation()
-    local locations = {
-        Vector3.new(math.random(-100, 100), 10, math.random(-100, 100)), -- Castelo
-        Vector3.new(math.random(-100, 100), 10, math.random(-100, 100)), -- Nikola Tesla Lab
-        Vector3.new(math.random(-100, 100), 10, math.random(-100, 100)), -- Cidade Abandonada
-        Vector3.new(math.random(-100, 100), 10, math.random(-100, 100))  -- Final
-    }
-    
-    local selectedLocation = locations[math.random(1, #locations)]
-    character:SetPrimaryPartCFrame(CFrame.new(selectedLocation))
-end
-
--- Interface Gráfica para o Jogo
-local screenGui = Instance.new("ScreenGui", player.PlayerGui)
-screenGui.Name = "GameInterface"
-
--- Fundo de tela
-local background = Instance.new("Frame", screenGui)
-background.Size = UDim2.new(0, 300, 0, 500)
-background.Position = UDim2.new(0.5, -150, 0.5, -250)
-background.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-background.BackgroundTransparency = 0.2
-background.BorderSizePixel = 0
-background.Visible = true
-
--- Título do painel
-local titleLabel = Instance.new("TextLabel", background)
-titleLabel.Text = "Menu de Jogo"
-titleLabel.Size = UDim2.new(0, 300, 0, 50)
-titleLabel.Position = UDim2.new(0, 0, 0, 0)
-titleLabel.BackgroundTransparency = 1
-titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-titleLabel.TextScaled = true
-titleLabel.Font = Enum.Font.GothamBold
-
--- Botão para teleportar
-local teleportButton = Instance.new("TextButton", background)
-teleportButton.Size = UDim2.new(0, 260, 0, 50)
-teleportButton.Position = UDim2.new(0, 20, 0, 70)
-teleportButton.Text = "Teleportar Aleatório"
-teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-teleportButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
-teleportButton.Font = Enum.Font.Gotham
-teleportButton.TextSize = 20
-
-teleportButton.MouseButton1Click:Connect(function()
-    teleportToRandomLocation()
-end)
-
--- Botão para ativar/desativar o voo
-local flyButton = Instance.new("TextButton", background)
-flyButton.Size = UDim2.new(0, 260, 0, 50)
-flyButton.Position = UDim2.new(0, 20, 0, 140)
-flyButton.Text = "Ativar/Desativar Voo"
-flyButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-flyButton.BackgroundColor3 = Color3.fromRGB(0, 128, 255)
-flyButton.Font = Enum.Font.Gotham
-flyButton.TextSize = 20
-
-flyButton.MouseButton1Click:Connect(function()
-    toggleFly()
-end)
-
--- Botão para minimizar/maximizar a interface
-local toggleButton = Instance.new("TextButton", screenGui)
-toggleButton.Size = UDim2.new(0, 50, 0, 50)
-toggleButton.Position = UDim2.new(0, 10, 0, 10)
-toggleButton.Text = "DR"
-toggleButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-toggleButton.Font = Enum.Font.GothamBold
-toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-
-local minimized = false
-toggleButton.MouseButton1Click:Connect(function()
-    if minimized then
-        background.Visible = true
-    else
-        background.Visible = false
-    end
-    minimized = not minimized
-end)
-
--- ESP de itens (Exemplo básico)
-local function createESP(part)
-    local esp = Instance.new("BillboardGui")
-    esp.Adornee = part
-    esp.Size = UDim2.new(0, 100, 0, 50)
-    esp.StudsOffset = Vector3.new(0, 3, 0)
-    esp.Parent = part
-
-    local textLabel = Instance.new("TextLabel", esp)
-    textLabel.Text = "Item!"
-    textLabel.Size = UDim2.new(1, 0, 1, 0)
-    textLabel.BackgroundTransparency = 1
-    textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-end
-
--- Exemplo: Adicionando ESP a um item
-for _, item in pairs(workspace:GetChildren()) do
-    if item:IsA("Part") then
-        createESP(item)
-    end
-end
