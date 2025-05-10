@@ -1,9 +1,9 @@
---[[ 
-Script para Dead Rails com Sistema de Key
-Inclui: Fly, Noclip, ESP, Teleporte, Vida Infinita, Combustível Infinito, Energia Infinita, Trem
+--[[
+Script for Dead Rails with Aimbot, Killaura, Item Teleport, and Key System
+Includes: Fly, Noclip, ESP, Infinite Health, Infinite Fuel, Aimbot, Killaura, Item Teleport
 ]]
 
--- Proteção
+-- Protection
 local CoreGui = game:GetService("CoreGui")
 local function safeGuiParent()
     return (gethui and gethui()) or CoreGui
@@ -13,7 +13,7 @@ if safeGuiParent():FindFirstChild("DR_GUI_6659") then
     safeGuiParent()["DR_GUI_6659"]:Destroy()
 end
 
--- GUI de Key
+-- Key GUI
 local KeyGui = Instance.new("ScreenGui")
 KeyGui.Name = "DR_GUI_6659"
 KeyGui.Parent = safeGuiParent()
@@ -29,7 +29,7 @@ KeyFrame.Parent = KeyGui
 local KeyTitle = Instance.new("TextLabel")
 KeyTitle.Size = UDim2.new(1, 0, 0, 40)
 KeyTitle.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-KeyTitle.Text = "🔐 Insira a Key para desbloquear"
+KeyTitle.Text = "🔐 Insert the Key to unlock"
 KeyTitle.TextColor3 = Color3.new(1, 1, 1)
 KeyTitle.TextSize = 18
 KeyTitle.Parent = KeyFrame
@@ -37,7 +37,7 @@ KeyTitle.Parent = KeyFrame
 local KeyBox = Instance.new("TextBox")
 KeyBox.Size = UDim2.new(0.8, 0, 0, 30)
 KeyBox.Position = UDim2.new(0.1, 0, 0, 60)
-KeyBox.PlaceholderText = "Digite a key aqui..."
+KeyBox.PlaceholderText = "Enter the key here..."
 KeyBox.Text = ""
 KeyBox.TextSize = 16
 KeyBox.TextColor3 = Color3.new(1, 1, 1)
@@ -47,35 +47,40 @@ KeyBox.Parent = KeyFrame
 local CopyBtn = Instance.new("TextButton")
 CopyBtn.Size = UDim2.new(0.8, 0, 0, 30)
 CopyBtn.Position = UDim2.new(0.1, 0, 0, 100)
-CopyBtn.Text = "🔗 Obter Key"
+CopyBtn.Text = "🔗 Get Key"
 CopyBtn.TextSize = 16
 CopyBtn.TextColor3 = Color3.new(1, 1, 1)
 CopyBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 CopyBtn.Parent = KeyFrame
 CopyBtn.MouseButton1Click:Connect(function()
-    setclipboard("https://loot-link.com/s?KCyoj6LG")
+    setclipboard("https://direct-link.net/1348607/script-for-dead-rails")
+    game:GetService("StarterGui"):SetCore("SendNotification", {
+        Title = "Link Copied!",
+        Text = "The link has been copied to the clipboard.",
+        Duration = 3
+    })
 end)
 
 local EnviarBtn = Instance.new("TextButton")
 EnviarBtn.Size = UDim2.new(0.8, 0, 0, 30)
 EnviarBtn.Position = UDim2.new(0.1, 0, 0, 140)
-EnviarBtn.Text = "✅ Enviar Key"
+EnviarBtn.Text = "✅ Submit Key"
 EnviarBtn.TextSize = 16
 EnviarBtn.TextColor3 = Color3.new(1, 1, 1)
 EnviarBtn.BackgroundColor3 = Color3.fromRGB(40, 130, 40)
 EnviarBtn.Parent = KeyFrame
 
--- Efeito de Fade In
+-- Fade In Effect
 KeyFrame.BackgroundTransparency = 1
 game:GetService("TweenService"):Create(KeyFrame, TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {BackgroundTransparency = 0}):Play()
 
 EnviarBtn.MouseButton1Click:Connect(function()
-    if KeyBox.Text:lower() == "baitola" then
-        -- Remove a janela de key
+    if KeyBox.Text:lower() == "rbx344423" then
+        -- Remove key window
         KeyFrame.Visible = false
         wait(0.5)
         
-        -- Menu Principal
+        -- Main Menu
         local MainFrame = Instance.new("Frame")
         MainFrame.Size = UDim2.new(0, 300, 0, 400)
         MainFrame.Position = UDim2.new(0, 50, 0.5, -200)
@@ -86,26 +91,26 @@ EnviarBtn.MouseButton1Click:Connect(function()
         local Title = Instance.new("TextLabel")
         Title.Size = UDim2.new(1, 0, 0, 40)
         Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-        Title.Text = "🛠️ Menu Dead Rails"
+        Title.Text = "🛠️ Dead Rails Menu"
         Title.TextColor3 = Color3.new(1, 1, 1)
         Title.TextSize = 20
         Title.Parent = MainFrame
 
-        local function criarBotao(nome, ordem, callback)
+        local function createButton(name, order, callback)
             local btn = Instance.new("TextButton")
             btn.Size = UDim2.new(1, -20, 0, 30)
-            btn.Position = UDim2.new(0, 10, 0, 50 + (ordem - 1) * 35)
+            btn.Position = UDim2.new(0, 10, 0, 50 + (order - 1) * 35)
             btn.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
             btn.TextColor3 = Color3.new(1, 1, 1)
-            btn.Text = nome
+            btn.Text = name
             btn.TextSize = 16
             btn.Parent = MainFrame
 
-            -- Efeito de Animação (fade in)
+            -- Animation Effect (fade in)
             btn.TextTransparency = 1
             game:GetService("TweenService"):Create(btn, TweenInfo.new(0.5, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {TextTransparency = 0}):Play()
             
-            -- Animação do botão de Zoom
+            -- Button Zoom Animation
             btn.MouseEnter:Connect(function()
                 game:GetService("TweenService"):Create(btn, TweenInfo.new(0.2, Enum.EasingStyle.Sine, Enum.EasingDirection.InOut), {Size = UDim2.new(1, -20, 0, 40)}):Play()
             end)
@@ -116,7 +121,7 @@ EnviarBtn.MouseButton1Click:Connect(function()
             btn.MouseButton1Click:Connect(callback)
         end
 
-        -- Sistema de Vida Infinita
+        -- Infinite Health System
         local player = game.Players.LocalPlayer
         local character = player.Character or player.CharacterAdded:Wait()
         local humanoid = character:WaitForChild("Humanoid")
@@ -127,93 +132,166 @@ EnviarBtn.MouseButton1Click:Connect(function()
             end
         end)
 
-        -- Sistema de Combustível Infinito (Trem)
-        local function ativarCombustivelInfinito()
-            local trem = character:FindFirstChild("Train") -- Supondo que o trem é um modelo chamado "Train"
-            if trem then
-                local combustivel = trem:FindFirstChild("Fuel") -- Supondo que o combustível do trem é controlado por esse atributo
-                if combustivel then
-                    combustivel.Value = math.huge -- Combustível infinito
+        -- Infinite Fuel System (Train)
+        local function activateInfiniteFuel()
+            local train = character:FindFirstChild("Train") -- Assuming the train is a model named "Train"
+            if train then
+                local fuel = train:FindFirstChild("Fuel") -- Assuming the train's fuel is controlled by this attribute
+                if fuel then
+                    fuel.Value = math.huge -- Infinite fuel
                 end
             end
         end
 
-        -- Sistema de Energia Infinita
-        local function ativarEnergiaInfinita()
-            -- Vamos assumir que a energia é controlada de forma similar ao combustível
-            local energia = character:FindFirstChild("Energia") -- Exemplo de energia
-            if energia then
-                energia.Value = math.huge -- Energia infinita
+        -- Infinite Energy System
+        local function activateInfiniteEnergy()
+            -- Assuming energy is controlled similarly to fuel
+            local energy = character:FindFirstChild("Energy") -- Example of energy
+            if energy then
+                energy.Value = math.huge -- Infinite energy
             end
         end
 
-        -- Ativar os sistemas de combustível e energia infinita
-        ativarCombustivelInfinito()
-        ativarEnergiaInfinita()
+        -- Activate infinite fuel and energy systems
+        activateInfiniteFuel()
+        activateInfiniteEnergy()
 
-        -- Criando os botões no menu
-        criarBotao("Ir para o Castelo", 1, function()
-            teleportar(Vector3.new(100, 10, 100))
-        end)
-
-        criarBotao("Ir para Cidade Abandonada", 2, function()
-            teleportar(Vector3.new(-150, 10, 200))
-        end)
-
-        criarBotao("Ir para o Laboratório", 3, function()
-            teleportar(Vector3.new(250, 10, -100))
-        end)
-
-        criarBotao("Ir para o Final", 4, function()
-            teleportar(Vector3.new(0, 10, 0))
-        end)
-
-        -- Botão para Fly
-        local flying = false
-        criarBotao("Ativar Fly", 5, function()
-            local player = game.Players.LocalPlayer
-            local char = player.Character or player.CharacterAdded:Wait()
-            local hrp = char:WaitForChild("HumanoidRootPart")
-            flying = not flying
-            if flying then
-                local bv = Instance.new("BodyVelocity")
-                bv.Name = "FlyVelocity"
-                bv.MaxForce = Vector3.new(1, 1, 1) * 1e9
-                bv.Velocity = Vector3.new(0, 50, 0)
-                bv.Parent = hrp
-            else
-                if hrp:FindFirstChild("FlyVelocity") then
-                    hrp:FindFirstChild("FlyVelocity"):Destroy()
-                end
-            end
-        end)
-
-        -- Botão para Noclip
-        local noclip = false
-        criarBotao("Ativar Noclip", 6, function()
-            noclip = not noclip
-            game:GetService("RunService").Stepped:Connect(function()
-                if noclip then
-                    for _, v in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
-                        if v:IsA("BasePart") and v.CanCollide then
-                            v.CanCollide = false
+        -- Create buttons in the menu
+        createButton("Activate Aimbot", 1, function()
+            -- Aimbot System
+            local aimbot = true
+            while aimbot do
+                wait(0.1)
+                local nearestEnemy = nil
+                local shortestDistance = math.huge
+                for _, enemy in pairs(game.Players:GetPlayers()) do
+                    if enemy ~= player and enemy.Character and enemy.Character:FindFirstChild("HumanoidRootPart") then
+                        local distance = (enemy.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).magnitude
+                        if distance < shortestDistance then
+                            nearestEnemy = enemy
+                            shortestDistance = distance
                         end
                     end
                 end
-            end)
-        end)
-
-        -- Botão de Minimizar/Maximizar
-        local minimizado = false
-        criarBotao("Minimizar/Maximizar", 7, function()
-            for _, v in pairs(MainFrame:GetChildren()) do
-                if v:IsA("TextButton") or v:IsA("TextLabel") then
-                    if v ~= Title then v.Visible = not minimizado end
+                if nearestEnemy then
+                    local targetPos = nearestEnemy.Character.HumanoidRootPart.Position
+                    -- Rotate the player's camera towards the enemy
+                    workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, targetPos)
                 end
             end
-            minimizado = not minimizado
         end)
+
+        createButton("Activate Killaura", 2, function()
+            -- Killaura System (attack nearby enemies)
+            local killaura = true
+            while killaura do
+                wait(0.1)
+                local nearestEnemy = nil
+                local shortestDistance = 10
+                for _, enemy in pairs(game.Players:GetPlayers()) do
+                    if enemy ~= player and enemy.Character and enemy.Character:FindFirstChild("Humanoid") then
+                        local distance = (enemy.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).magnitude
+                        if distance < shortestDistance then
+                            nearestEnemy = enemy
+                            shortestDistance = distance
+                        end
+                    end
+                end
+                if nearestEnemy then
+                    local enemyHumanoid = nearestEnemy.Character:FindFirstChild("Humanoid")
+                    if enemyHumanoid then
+                        enemyHumanoid:TakeDamage(10) -- Example damage value
+                    end
+                end
+            end
+        end)
+
+        createButton("Activate Noclip", 3, function()
+            -- Noclip System
+            local noclip = false
+            local function toggleNoclip()
+                noclip = not noclip
+                if noclip then
+                    character:FindFirstChild("Humanoid").RootPart.CanCollide = false
+                    while noclip do
+                        wait(0.1)
+                        character:FindFirstChild("Humanoid").RootPart.CFrame = character:FindFirstChild("Humanoid").RootPart.CFrame + character:FindFirstChild("Humanoid").RootPart.Velocity
+                    end
+                else
+                    character:FindFirstChild("Humanoid").RootPart.CanCollide = true
+                end
+            end
+            toggleNoclip()
+        end)
+
+        createButton("Activate Fly", 4, function()
+            -- Fly System
+            local flySpeed = 50
+            local flying = false
+            local function startFly()
+                flying = true
+                while flying do
+                    wait(0.1)
+                    character:FindFirstChild("Humanoid").RootPart.Velocity = Vector3.new(0, flySpeed, 0)
+                end
+            end
+            local function stopFly()
+                flying = false
+            end
+
+            -- Toggle Fly
+            if not flying then
+                startFly()
+            else
+                stopFly()
+            end
+        end)
+
+        createButton("Activate ESP", 5, function()
+            -- ESP System
+            local esp = true
+            while esp do
+                wait(0.5)
+                for _, enemy in pairs(game.Players:GetPlayers()) do
+                    if enemy.Character and enemy.Character:FindFirstChild("HumanoidRootPart") then
+                        local espPart = Instance.new("BillboardGui")
+                        espPart.Size = UDim2.new(0, 100, 0, 50)
+                        espPart.Adornee = enemy.Character.HumanoidRootPart
+                        espPart.StudsOffset = Vector3.new(0, 2, 0)
+                        espPart.Parent = enemy.Character
+                        local textLabel = Instance.new("TextLabel")
+                        textLabel.Size = UDim2.new(1, 0, 1, 0)
+                        textLabel.Text = enemy.Name
+                        textLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+                        textLabel.TextSize = 16
+                        textLabel.BackgroundTransparency = 1
+                        textLabel.Parent = espPart
+                    end
+                end
+            end
+        end)
+
+        createButton("Teleport Items", 6, function()
+            -- Item Teleport System
+            local function teleportItem(itemName)
+                for _, item in pairs(workspace:GetChildren()) do
+                    if item.Name:lower() == itemName:lower() then
+                        item.CFrame = player.Character.HumanoidRootPart.CFrame
+                    end
+                end
+            end
+
+            -- Teleport specific items
+            teleportItem("GoldBar")
+            teleportItem("IronBar")
+        end)
+
     else
-        KeyBox.Text = "❌ Key incorreta"
+        game:GetService("StarterGui"):SetCore("SendNotification", {
+            Title = "Invalid Key!",
+            Text = "The key you entered is incorrect.",
+            Duration = 3
+        })
     end
 end)
+
